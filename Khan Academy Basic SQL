@@ -1,0 +1,10 @@
+CREATE TABLE clothingstore (
+    id TEXT,
+    clothes TEXT,
+    price_USD INTEGER);
+INSERT INTO clothingstore VALUES (1,"A Bathing Ape sweatshirt", 300), (2, "Versache bag", 1000), (3, "Stussy shirt", 80), (4, "Supreme Sweatshirt", 180), (5, "Dior Collogne", 100),(6,"A Bathing Ape sweatshirt", 300), (7, "Versache bag", 1500), (8, "Stussy Sweatshirt", 150), (9, "Viori Sweatshirt", 130), (10, "Dior Shirt", 100), (11,"Prada bag", 300), (12, "Supreme Hat", 180), (13, "Dior Collogne", 100), (14,"Dior Signature Collogne", 300), (15, "Versache Shirt", 500);
+SELECT * FROM clothingstore
+ORDER BY price_USD ASC;
+SELECT COUNT(clothes)
+FROM clothingstore
+WHERE price_USD;
