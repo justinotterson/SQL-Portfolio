@@ -1,0 +1,175 @@
+# Google-Data-Analytics--Bellabeat-Case-Study
+
+##DATA CLEANING
+
+##Check for duplicates
+SELECT DISTINCT * 
+FROM portfolio.world_happiness;
+
+##Remove irrelevant columns: Sometimes, the dataset may contain columns that are not relevant to the analysis. We can use the ALTER TABLE statement to remove these columns.
+ALTER TABLE portfolio.world_happiness
+DROP COLUMN Column_Name;
+
+
+##Handle missing values: Missing values can cause issues during analysis. We can use the UPDATE statement to replace missing values with appropriate values. For example, we can replace all missing values with NULL using the following statement:
+UPDATE portfolio.world_happiness
+SET Column_Name = NULL
+WHERE Column_Name = '';
+##Here, Column_Name is the name of the column that contains missing values.
+
+##Handle inconsistent data: Sometimes, the dataset may contain inconsistent data. For example, some records may have values in upper case while others may have values in lower case. We can use the LOWER or UPPER functions to standardize the data.
+UPDATE portfolio.world_happiness
+SET Country = LOWER(Country);
+##Here, we are converting the values in the Country column to lower case.
+
+##Handle data in wrong format: Sometimes, the data may be in the wrong format. For example, a numeric column may contain non-numeric values. We can use the TRY_CAST or TRY_CONVERT functions to convert the data to the correct format.
+UPDATE portfolio.world_happiness
+SET Column_Name = TRY_CAST(Column_Name AS float);
+##Here, Column_Name is the name of the column that contains non-numeric values.
+
+##Remove unnecessary columns: The dataset contains a column named Overall rank which is just a ranking of the countries based on their happiness score. We can drop this column since we already have the happiness score.
+ALTER TABLE portfolio.world_happiness
+DROP COLUMN `Overall rank`;
+
+##Remove rows with missing values
+DELETE FROM portfolio.world_happiness 
+WHERE 'Country or region' IS NULL OR Score IS NULL OR 'Gdp per Capita' IS NULL;
+
+##Convert string values to numeric values
+UPDATE portfolio.world_happiness SET Score = CAST(Score AS float), Gdp per capita = CAST(Gdp per capita AS float), Social support = CAST(Social support AS float), Healthy life expectancy = CAST(Healthy life expectancy AS float), Freedom to make life choices = CAST(Freedom to make life choices AS float), Generosity = CAST(Generosity AS float), Perceptions of corruption = CAST(Perceptions of corruption AS float);
+
+
+##DATA ANALYSIS
+
+##Retrieve the first 10 rows of the dataset:
+SELECT *
+FROM portfolio.world_happiness
+LIMIT 10;
+
+##Calculate the average score for each of the six factors that contribute to the happiness score:
+SELECT
+  AVG(gdp_per_capita),
+  AVG(social_support),
+  AVG(healthy_life_expectancy),
+  AVG(freedom_to_make_life_choices),
+  AVG(generosity),
+  AVG(perceptions_of_corruption)
+FROM portfolio.world_happiness;
+
+##Find the top 10 happiest countries in the dataset:
+SELECT country_or_region, score
+FROM portfolio.world_happiness
+ORDER BY score DESC
+LIMIT 10;
+
+##Calculate the Happiness Index:
+SELECT 
+  (`Country or Region`) AS `Country or Region`,
+  `Score`,
+  `GDP per capita`,
+  `Social support`,
+  `Healthy life expectancy`,
+  `Freedom to make life choices`,
+  `Generosity`,
+  `Perceptions of corruption`,
+  (`GDP per capita` * `Social support`) / (`Healthy life expectancy` * `Freedom to make life choices` * `Perceptions of corruption`) AS `Happiness Index`
+FROM `portfolio`.`world_happiness`;
+
+
+##Calculate the average happiness score for each region:
+SELECT region, AVG(score) AS avg_score
+FROM Portfolio.world_happiness
+GROUP BY Country or region;
+
+
+
+##To explore any patterns or relationships between the 'Happiness Index' and other variables in the dataset, we can use descriptive statistics and data visualization techniques.
+
+##Descriptive Statistics: let's calculate some descriptive statistics for the 'Happiness Index' and other variables. We can use the following SQL query
+
+SELECT
+  AVG(`Happiness Index`) AS `Avg. Happiness Index`,
+  MIN(`Happiness Index`) AS `Min. Happiness Index`,
+  MAX(`Happiness Index`) AS `Max. Happiness Index`,
+  STDDEV(`Happiness Index`) AS `Std. Dev. Happiness Index`,
+  AVG(`Score`) AS `Avg. Score`,
+  MIN(`Score`) AS `Min. Score`,
+  MAX(`Score`) AS `Max. Score`,
+  STDDEV(`Score`) AS `Std. Dev. Score`,
+  AVG(`GDP per capita`) AS `Avg. GDP per capita`,
+  MIN(`GDP per capita`) AS `Min. GDP per capita`,
+  MAX(`GDP per capita`) AS `Max. GDP per capita`,
+  STDDEV(`GDP per capita`) AS `Std. Dev. GDP per capita`,
+  AVG(`Social support`) AS `Avg. Social support`,
+  MIN(`Social support`) AS `Min. Social support`,
+  MAX(`Social support`) AS `Max. Social support`,
+  STDDEV(`Social support`) AS `Std. Dev. Social support`,
+  AVG(`Healthy life expectancy`) AS `Avg. Healthy life expectancy`,
+  MIN(`Healthy life expectancy`) AS `Min. Healthy life expectancy`,
+  MAX(`Healthy life expectancy`) AS `Max. Healthy life expectancy`,
+  STDDEV(`Healthy life expectancy`) AS `Std. Dev. Healthy life expectancy`,
+  AVG(`Freedom to make life choices`) AS `Avg. Freedom to make life choices`,
+  MIN(`Freedom to make life choices`) AS `Min. Freedom to make life choices`,
+  MAX(`Freedom to make life choices`) AS `Max. Freedom to make life choices`,
+  STDDEV(`Freedom to make life choices`) AS `Std. Dev. Freedom to make life choices`,
+  AVG(`Generosity`) AS `Avg. Generosity`,
+  MIN(`Generosity`) AS `Min. Generosity`,
+  MAX(`Generosity`) AS `Max. Generosity`,
+  STDDEV(`Generosity`) AS `Std. Dev. Generosity`,
+  AVG(`Perceptions of corruption`) AS `Avg. Perceptions of corruption`,
+  MIN(`Perceptions of corruption`) AS `Min. Perceptions of corruption`,
+  MAX(`Perceptions of corruption`) AS `Max. Perceptions of corruption`,
+  STDDEV(`Perceptions of corruption`) AS `Std. Dev. Perceptions of corruption`
+FROM `portfolio`.`world_happiness`;
+
+##This query will give us the average, minimum, maximum, and standard deviation for each variable in the dataset.
+
+##Data Visualization:
+SELECT
+  `GDP per capita`,
+  `Happiness Index`
+FROM `portfolio`.`world_happiness`
+ORDER BY `Happiness Index` DESC;
+
+##We can use this query to create a scatter plot using a tool like Excel or Tableau.
+
+##We can also use the following SQL query to create a bar chart showing the average 'Happiness Index' for each region:
+SELECT
+  `Country or Region`,
+  AVG(`Happiness Index`) AS `Avg. Happiness Index`
+FROM `portfolio`.`world_happiness`
+GROUP BY `Country or Region`
+
+##here's the code for the remaining steps of the analysis phase
+
+SELECT `Country or Region`, AVG(`Score`) AS `Average Happiness Score`, AVG(`Happiness Index`) AS `Average Happiness Index`
+FROM (
+    SELECT `Country or Region`, `Score`, (`GDP per capita` * `Social support`) / (`Healthy life expectancy` * `Freedom to make life choices` * `Perceptions of corruption`) AS `Happiness Index`
+    FROM `portfolio`.`world_happiness`
+) AS `h`
+GROUP BY `Country or Region`
+ORDER BY `Average Happiness Index` DESC;
+
+##Calculate the number of countries that have a happiness score above the average happiness score
+
+SELECT COUNT(*) AS `Number of Countries Above Average`
+FROM `portfolio`.`world_happiness`
+WHERE `Score` > (SELECT AVG(`Score`) FROM `portfolio`.`world_happiness`);
+
+##Calculate the number of countries that have a happiness index above the average happiness index
+
+SELECT COUNT(*) AS `Number of Countries Above Average`
+FROM (
+    SELECT `Country or Region`, `Score`, (`GDP per capita` * `Social support`) / (`Healthy life expectancy` * `Freedom to make life choices` * `Perceptions of corruption`) AS `Happiness Index`
+    FROM `portfolio`.`world_happiness`
+) AS `h`
+WHERE `Happiness Index` > (SELECT AVG(`Happiness Index`) FROM (
+    SELECT (`GDP per capita` * `Social support`) / (`Healthy life expectancy` * `Freedom to make life choices` * `Perceptions of corruption`) AS `Happiness Index`
+    FROM `portfolio`.`world_happiness`
+) AS `hi`);
+
+##Calculate the average happiness score and happiness index for the top 5 happiest countries
+SELECT `Country or Region`, `Score` AS `Happiness Score`, (`GDP per capita` * `Social support`) / (`Healthy life expectancy` * `Freedom to make life choices` * `Perceptions of corruption`) AS `Happiness Index`
+FROM `portfolio`.`world_happiness`
+ORDER BY `Happiness Index` DESC
+LIMIT 5;
