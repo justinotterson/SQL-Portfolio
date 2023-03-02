@@ -1,0 +1,71 @@
+SELECT * FROM portfolio.mxmh
+
+DESCRIBE portfolio.mxmh;
+
+##Check the frequency of each value in a particular column. This code is for the `Primary streaming service` column.
+SELECT `Primary streaming service`, COUNT(*) AS frequency FROM portfolio.mxmh GROUP BY `Primary streaming service`;
+
+##Check the distribution of a numeric column:
+SELECT AVG(`Hours per day`) AS avg_hours, MIN(`Hours per day`) AS min_hours, MAX(`Hours per day`) AS max_hours, STD(`Hours per day`) AS std_hours FROM portfolio.mxmh;
+##This query will return the average, minimum, maximum, and standard deviation of the 'Hours per day' column. We can replace this column with any other numeric column of interest to see its distribution.
+
+##Here are the SQL queries to answer the questions:
+
+## a. What percentage of respondents reported having a mental health disorder?
+
+SELECT COUNT(*) as total, 
+       SUM(OCD) as with_OCD, 
+       (SUM(OCD)/COUNT(*)) * 100 as percentage_with_OCD
+FROM portfolio.mxmh;
+
+##This query will count the total number of respondents and the number of respondents who reported having a mental health disorder 
+(OCD), and calculate the percentage of respondents who reported having a mental health disorder.
+
+SELECT COUNT(*)*100/(SELECT COUNT(*) FROM portfolio.mxmh) AS percentage
+FROM portfolio.mxmh
+WHERE OCD = 1 OR Insomnia = 1 OR Depression = 1 OR Anxiety = 1;
+
+## b. How does the percentage of respondents with a mental health disorder vary based on their music preferences?
+
+SELECT `Fav genre`, COUNT(*) * 100.0 / (SELECT COUNT(*) FROM portfolio.mxmh) AS percentage
+FROM portfolio.mxmh
+WHERE Depression = 1 OR Anxiety = 1
+GROUP BY `Fav genre`
+ORDER BY percentage DESC;
+
+## c. How does the percentage of respondents with a mental health disorder vary by those who listen to music while working?
+
+SELECT `While working`, COUNT(*)*100/(SELECT COUNT(*) FROM portfolio.mxmh WHERE `While working` IS NOT NULL) AS percentage
+FROM portfolio.mxmh
+WHERE OCD = 1 OR Insomnia = 1 OR Depression = 1 OR Anxiety = 1
+GROUP BY `While working`;
+##This query will group the respondents by their company size and calculate the percentage of respondents who reported having a mental health disorder (OCD) for each group.
+
+##d. What are the most common music genres preferred by respondents who reported having a mental health disorder?
+
+SELECT `Fav genre`, COUNT(*) AS count
+FROM portfolio.mxmh
+WHERE Depression = 1 OR Anxiety = 1
+GROUP BY `Fav genre`
+ORDER BY count DESC;
+
+
+## e. The following query counts the percentage of respondents who reported having a mental health disorder by age group:
+
+SELECT Age, COUNT(*)*100/(SELECT COUNT(*) FROM portfolio.mxmh WHERE OCD = 1 OR Insomnia = 1 OR Depression = 1 OR Anxiety = 1) AS percentage
+FROM portfolio.mxmh
+WHERE OCD = 1 OR Insomnia = 1 OR Depression = 1 OR Anxiety = 1
+GROUP BY Age;
+
+
+## f. This query calculates the percentage of respondents who reported listening while working, among those who provided a response to the Primary streaming service question. 
+
+SELECT `While working`, COUNT(*)*100/(SELECT COUNT(*) FROM portfolio.mxmh WHERE `While working` IS NOT NULL AND `Primary streaming service` IS NOT NULL) AS percentage
+FROM portfolio.mxmh
+WHERE `Primary streaming service` IS NOT NULL
+GROUP BY `While working`;
+
+##The denominator is the total number of respondents who provided 
+a response to the Primary streaming service question. The WHERE clause ensures that only responses with a non-null value for Primary 
+streaming service are included in the calculation
+
